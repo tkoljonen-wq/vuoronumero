@@ -12,7 +12,7 @@ window.I18N = {
     waiting: 'Odota vuoroasi. Sivu päivittyy automaattisesti.',
     aboutLink: 'Lue lisää Silmäaseman urheilunäöntutkimuksesta',
     bookLink: 'Varaa aika urheilunäöntutkimukseen',
-    resultYes: 'Suosittelemme jatkotutkimusta optikon urheilunäkötutkimuksessa.',
+    resultYes: 'Suosittelemme jatkotutkimuksena Silmäaseman optikon urheilunäöntutkimusta.',
     resultNo: 'Tarkastuksessa ei tullut esiin jatkotutkimuksen tarvetta. Halutessasi voit silti varata ajan.',
     done: 'Kiitos käynnistä!',
     closed: 'Näöntarkastus ei ole juuri nyt avoinna.',
