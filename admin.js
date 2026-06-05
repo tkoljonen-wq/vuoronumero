@@ -285,8 +285,20 @@
     catch (e) { alert('Toiminto epäonnistui: ' + (e && e.message ? e.message : 'tarkista yhteys')); }
   }
 
+  // Onko käyttäjä parhaillaan muokkaamassa syötekenttää (esim. kellonaika-
+  // tai taukovalitsin auki)? Tällöin emme saa piirtää näkymää uudelleen,
+  // koska se tuhoaisi kentän ja sulkisi valitsimen kesken syötön.
+  function isEditingInput() {
+    const el = document.activeElement;
+    return !!el && el.tagName === 'INPUT' && view.contains(el);
+  }
+
   async function refresh() {
-    try { state = await rpc('admin_state', { p_pwd: pwd }); renderDash(); }
+    try {
+      state = await rpc('admin_state', { p_pwd: pwd });
+      if (isEditingInput()) return;   // älä piirrä kesken syötön – tila päivittyy taustalla
+      renderDash();
+    }
     catch (e) { /* säilytä näkymä */ }
   }
 
