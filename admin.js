@@ -176,43 +176,53 @@
   }
 
   // ---- Modaali yksittäiselle numerolle ----
-  function openModal(tk) {
+  function openModal(initialTk) {
+    const numero = initialTk.numero;
     const back = document.createElement('div');
     back.className = 'modal-back';
-    back.innerHTML = `
-      <div class="modal">
-        <div class="num-big">${tk.numero}</div>
-        <h2 style="margin-top:6px">Suositeltiinko jatkotutkimusta?</h2>
-        <div class="row" style="margin-bottom:12px">
-          <button class="btn btn--sm ${tk.tulos === 'kylla' ? '' : 'btn--ghost'}" data-r="kylla">Kyllä</button>
-          <button class="btn btn--sm ${tk.tulos === 'ei' ? '' : 'btn--ghost'}" data-r="ei">Ei</button>
-        </div>
-        <div class="row" style="margin-bottom:8px">
-          ${tk.status !== 'vuorossa' ? '<button class="btn btn--sm" data-a="call">Kutsu vuoroon</button>' : ''}
-          <button class="btn" data-a="done">Merkitse valmiiksi</button>
-        </div>
-        <div class="row" style="margin-bottom:14px">
-          <button class="btn btn--sm btn--ghost" data-a="noshow">No-show</button>
-        </div>
-        <button class="btn btn--sm btn--ghost" data-a="close">Sulje</button>
-      </div>`;
     document.body.appendChild(back);
     const close = () => back.remove();
-    back.addEventListener('click', (e) => { if (e.target === back) close(); });
 
-    back.querySelectorAll('[data-r]').forEach((b) =>
-      b.addEventListener('click', async () => {
-        await act('admin_set_result', { p_pwd: pwd, p_number: tk.numero, p_result: b.dataset.r });
-        close();
-      }));
-    back.querySelectorAll('[data-a]').forEach((b) =>
-      b.addEventListener('click', async () => {
-        const a = b.dataset.a;
-        if (a === 'close') return close();
-        const map = { call: 'admin_call', done: 'admin_complete', noshow: 'admin_noshow' };
-        await act(map[a], { p_pwd: pwd, p_number: tk.numero });
-        close();
-      }));
+    // Hae numeron ajantasainen tila (päivittyy toiminnon jälkeen)
+    const currentTk = () => (state.tickets || []).find((t) => t.numero === numero) || initialTk;
+
+    function draw() {
+      const tk = currentTk();
+      back.innerHTML = `
+        <div class="modal">
+          <div class="num-big">${tk.numero}</div>
+          <h2 style="margin-top:6px">Suositeltiinko jatkotutkimusta?</h2>
+          <div class="row" style="margin-bottom:12px">
+            <button class="btn btn--sm ${tk.tulos === 'kylla' ? '' : 'btn--ghost'}" data-r="kylla">Kyllä</button>
+            <button class="btn btn--sm ${tk.tulos === 'ei' ? '' : 'btn--ghost'}" data-r="ei">Ei</button>
+          </div>
+          <div class="row" style="margin-bottom:8px">
+            ${tk.status !== 'vuorossa' ? '<button class="btn btn--sm" data-a="call">Kutsu vuoroon</button>' : ''}
+            <button class="btn" data-a="done">Merkitse valmiiksi</button>
+          </div>
+          <div class="row" style="margin-bottom:14px">
+            <button class="btn btn--sm btn--ghost" data-a="noshow">No-show</button>
+          </div>
+          <button class="btn btn--sm btn--ghost" data-a="close">Sulje</button>
+        </div>`;
+
+      back.querySelectorAll('[data-r]').forEach((b) =>
+        b.addEventListener('click', async () => {
+          await act('admin_set_result', { p_pwd: pwd, p_number: numero, p_result: b.dataset.r });
+          draw();   // päivitä valinta, pidä ikkuna auki
+        }));
+      back.querySelectorAll('[data-a]').forEach((b) =>
+        b.addEventListener('click', async () => {
+          const a = b.dataset.a;
+          if (a === 'close') return close();
+          const map = { call: 'admin_call', done: 'admin_complete', noshow: 'admin_noshow' };
+          await act(map[a], { p_pwd: pwd, p_number: numero });
+          if (a === 'done' || a === 'noshow') close();   // sulje vain päättävissä toiminnoissa
+          else draw();                                   // "Kutsu vuoroon" → pidä auki
+        }));
+    }
+
+    draw();
   }
 
   // ---- Apu: suorita toiminto ja päivitä ----
