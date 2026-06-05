@@ -188,18 +188,20 @@
 
     function draw() {
       const tk = currentTk();
+      const canDone = tk.tulos === 'kylla' || tk.tulos === 'ei';
       back.innerHTML = `
         <div class="modal">
           <div class="num-big">${tk.numero}</div>
+          ${tk.status !== 'vuorossa' ? '<div class="row" style="margin:10px 0 16px"><button class="btn" data-a="call">Aloita tutkimus</button></div>' : ''}
           <h2 style="margin-top:6px">Suositeltiinko jatkotutkimusta?</h2>
           <div class="row" style="margin-bottom:12px">
             <button class="btn btn--sm ${tk.tulos === 'kylla' ? '' : 'btn--ghost'}" data-r="kylla">Kyllä</button>
             <button class="btn btn--sm ${tk.tulos === 'ei' ? '' : 'btn--ghost'}" data-r="ei">Ei</button>
           </div>
           <div class="row" style="margin-bottom:8px">
-            ${tk.status !== 'vuorossa' ? '<button class="btn btn--sm" data-a="call">Kutsu vuoroon</button>' : ''}
-            <button class="btn" data-a="done">Merkitse valmiiksi</button>
+            <button class="btn" data-a="done" ${canDone ? '' : 'disabled'}>Merkitse valmiiksi</button>
           </div>
+          ${canDone ? '' : '<p class="muted" style="margin:-2px 0 12px;font-size:13px">Valitse ensin Kyllä tai Ei.</p>'}
           <div class="row" style="margin-bottom:14px">
             <button class="btn btn--sm btn--ghost" data-a="noshow">No-show</button>
           </div>
