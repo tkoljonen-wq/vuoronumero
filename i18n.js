@@ -3,7 +3,7 @@ window.I18N = {
   fi: {
     appTitle: 'Näöntarkastus',
     subtitle: 'e-sports · Silmäasema',
-    enroll: 'Ilmoittaudu näöntarkastukseen',
+    enroll: 'Ilmoittaudu pelinäkösi arviointiin',
     yourNumber: 'Vuoronumerosi',
     estimate: 'Arvioitu aika',
     ahead: 'Edellä jonossa',
@@ -29,7 +29,7 @@ window.I18N = {
   en: {
     appTitle: 'Vision screening',
     subtitle: 'e-sports · Silmäasema',
-    enroll: 'Join the vision screening',
+    enroll: 'Assess your gaming vision',
     yourNumber: 'Your number',
     estimate: 'Estimated time',
     ahead: 'Ahead of you',
