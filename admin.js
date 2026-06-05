@@ -32,14 +32,11 @@
     return d;
   }
 
-  // Palauttaa varoituksen, jos nykyinen jono ei arviolta ehdi sulkeutumisaikaan.
-  // Käyttää keskimääräistä tutkimusaikaa (avg_sec); huomioi parhaillaan
-  // palveltavan ja tauot samalla tavalla kuin asiakkaan arvio. null = ei varoitusta.
-  function closingWarning(c, tickets, breaks) {
-    if (!c.is_open) return null;                       // jo suljettu → ei tarvetta
+  // Aika sekunteina koko nykyisen jonon käsittelyyn annetulla tutkimusajalla.
+  // Sama logiikka kuin asiakkaan estimateSeconds (jonossa olevat × unit +
+  // parhaillaan palveltavan jäljellä oleva aika + matkalle osuvat tauot).
+  function queueClearSeconds(c, tickets, breaks, unit) {
     const waiting = tickets.filter((t) => t.status === 'odottaa').length;
-    if (waiting === 0) return null;
-    const unit = c.avg_sec > 0 ? c.avg_sec : 360;      // ei dataa → 6 min oletus
     let secs = waiting * unit;
     if (c.serving_num != null && c.serving_since) {
       const elapsed = (Date.now() - new Date(c.serving_since).getTime()) / 1000;
@@ -53,9 +50,23 @@
         secs += (end - Math.max(start, now)) / 1000;
       }
     });
-    const endDate = new Date(now + secs * 1000);
-    if (endDate <= closingTimeToday(c.hours_end)) return null;
-    return { end: fmt(endDate), close: c.hours_end };
+    return secs;
+  }
+
+  // Palauttaa varoituksen, jos jono ei arviolta ehdi sulkeutumisaikaan.
+  // Käyttää samaa arviota kuin asiakas: mediaani (unit_low)–p75 (unit_high).
+  // Varoittaa kun ylärajakaan ei mahdu aukioloajan sisään. null = ei varoitusta.
+  function closingWarning(c, tickets, breaks) {
+    if (!c.is_open) return null;                       // jo suljettu → ei tarvetta
+    const waiting = tickets.filter((t) => t.status === 'odottaa').length;
+    if (waiting === 0) return null;
+    const unitLow = c.unit_low || 360;
+    const unitHigh = c.unit_high || unitLow;
+    const now = Date.now();
+    const lowEnd = new Date(now + queueClearSeconds(c, tickets, breaks, unitLow) * 1000);
+    const highEnd = new Date(now + queueClearSeconds(c, tickets, breaks, unitHigh) * 1000);
+    if (highEnd <= closingTimeToday(c.hours_end)) return null;
+    return { low: fmt(lowEnd), high: fmt(highEnd), close: c.hours_end };
   }
 
   // ---- Login ----
@@ -94,7 +105,7 @@
     view.innerHTML = `
       ${warn ? `<div class="card" style="background:var(--orange);color:#fff;margin-bottom:16px">
         <strong>⚠ Jono ei arviolta ehdi sulkemisaikaan mennessä</strong>
-        <p style="margin:6px 0 0">Viimeinen vuoro arviolta n. klo ${warn.end}, sulkeutumisaika klo ${warn.close}.<br>
+        <p style="margin:6px 0 0">Viimeinen vuoro arviolta n. klo ${warn.low === warn.high ? warn.high : warn.low + '–' + warn.high}, sulkeutumisaika klo ${warn.close}.<br>
         Voit sulkea jonotuksen alta (“Tila”) — jonossa olevat ehditään palvella, mutta uusia ei enää oteta.</p>
       </div>` : ''}
       <div class="stat-row" style="margin-bottom:16px">
