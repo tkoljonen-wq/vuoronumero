@@ -54,7 +54,7 @@
     const c = state.config;
     const tickets = state.tickets || [];
     const breaks = state.breaks || [];
-    const avgMin = (c.avg_sec / 60).toFixed(1);
+    const avgMin = (c.avg_sec > 0) ? (c.avg_sec / 60).toFixed(1) : '–';
 
     view.innerHTML = `
       <div class="stat-row" style="margin-bottom:16px">

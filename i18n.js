@@ -23,6 +23,8 @@ window.I18N = {
     soon: 'aivan pian',
     newNumber: 'Ota uusi vuoronumero',
     minutes: 'min',
+    approx: 'noin',
+    approxUnder: 'alle',
     approxAt: 'noin klo',
     privacy: 'Sovellus ei kysy eikä tallenna henkilötietoja. Vuoronumerosi säilyy vain tällä laitteella.'
   },
@@ -49,6 +51,8 @@ window.I18N = {
     soon: 'very soon',
     newNumber: 'Get a new number',
     minutes: 'min',
+    approx: 'approx.',
+    approxUnder: 'under',
     approxAt: 'around',
     privacy: 'This app does not ask for or store any personal data. Your number is kept only on this device.'
   }

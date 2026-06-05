@@ -13,11 +13,6 @@
 
   function t(key) { return (window.I18N[lang] && window.I18N[lang][key]) || key; }
 
-  function fmtTime(date) {
-    return date.toLocaleTimeString(lang === 'fi' ? 'fi-FI' : 'en-GB',
-      { hour: '2-digit', minute: '2-digit' });
-  }
-
   function applyStaticI18n() {
     document.documentElement.lang = lang;
     document.querySelectorAll('[data-i18n]').forEach((el) => {
@@ -29,13 +24,14 @@
   }
 
   // ---- Arvioidun ajan laskenta ----
-  function estimateSeconds(s) {
-    const avg = s.avg_sec || 360;
+  // Laskee odotusajan sekunteina annetulla tutkimuksen yksikköajalla (unit).
+  // unit_low = mediaani, unit_high = 75. persentiili (lasketaan backendissä).
+  function estimateSeconds(s, unit) {
     const ahead = s.ahead || 0;
-    let secs = ahead * avg;
+    let secs = ahead * unit;
     if (s.serving != null && s.serving_since) {
       const elapsed = (Date.now() - new Date(s.serving_since).getTime()) / 1000;
-      secs += Math.max(0, avg - elapsed);
+      secs += Math.max(0, unit - elapsed);
     }
     // Lisää väliin osuvat tauot
     const now = Date.now();
@@ -47,6 +43,19 @@
       }
     });
     return secs;
+  }
+
+  // Pyöristää sekunnit 5 minuutin tarkkuuteen ja muotoilee vaihteluvälin tekstiksi.
+  function formatRange(lowSec, highSec) {
+    const STEP = 5; // minuuttia
+    const toMin = (sec) => Math.round(sec / 60 / STEP) * STEP;
+    let lo = toMin(lowSec);
+    let hi = toMin(highSec);
+    if (hi < lo) hi = lo;
+    if (hi < STEP) return t('soon');                                    // alle ~5 min
+    if (lo < STEP) return `${t('approxUnder')} ${hi} ${t('minutes')}`;  // esim. "alle 25 min"
+    if (lo === hi) return `${t('approx')} ${hi} ${t('minutes')}`;       // esim. "noin 20 min"
+    return `${lo}–${hi} ${t('minutes')}`;                               // esim. "20–25 min"
   }
 
   // ---- Näkymät ----
@@ -71,9 +80,9 @@
   }
 
   function renderWaiting(s) {
-    const secs = estimateSeconds(s);
-    const turn = new Date(Date.now() + secs * 1000);
-    const timeText = secs < 60 ? t('soon') : `${t('approxAt')} ${fmtTime(turn)}`;
+    const unitLow = s.unit_low || 360;
+    const unitHigh = s.unit_high || unitLow;
+    const timeText = formatRange(estimateSeconds(s, unitLow), estimateSeconds(s, unitHigh));
     view.innerHTML = `
       <section class="card center">
         <div class="label">${t('yourNumber')}</div>
