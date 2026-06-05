@@ -10,7 +10,7 @@ window.I18N = {
     aheadUnit: 'henkilöä',
     nowServing: 'Nyt vuorossa',
     waiting: 'Odota vuoroasi. Sivu päivittyy automaattisesti.',
-    aboutLink: 'Lue lisää e-sports-näöntarkastuksesta',
+    aboutLink: 'Lue lisää Silmäaseman urheilunäöntutkimuksesta',
     bookLink: 'Varaa aika urheilunäöntutkimukseen',
     resultYes: 'Suosittelemme jatkotutkimusta optikon urheilunäkötutkimuksessa.',
     resultNo: 'Tarkastuksessa ei tullut esiin jatkotutkimuksen tarvetta. Halutessasi voit silti varata ajan.',
