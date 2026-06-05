@@ -1,0 +1,7 @@
+# ÄLÄ julkaise – sisältää admin-salasanan
+supabase.sql
+
+# Sisäiset tiedostot, ei tarvita tuotannossa
+.claude/
+Brändikäsikirja.pdf
+brandbook.txt
