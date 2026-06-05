@@ -11,7 +11,7 @@ window.I18N = {
     nowServing: 'Nyt vuorossa',
     waiting: 'Odota vuoroasi. Sivu päivittyy automaattisesti.',
     aboutLink: 'Lue lisää e-sports-näöntarkastuksesta',
-    bookLink: 'Varaa aika urheilunäkötutkimukseen',
+    bookLink: 'Varaa aika urheilunäöntutkimukseen',
     resultYes: 'Suosittelemme jatkotutkimusta optikon urheilunäkötutkimuksessa.',
     resultNo: 'Tarkastuksessa ei tullut esiin jatkotutkimuksen tarvetta. Halutessasi voit silti varata ajan.',
     done: 'Kiitos käynnistä!',
