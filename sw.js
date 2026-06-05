@@ -1,7 +1,7 @@
 // Service worker – network first -strategia.
 // Hae aina ensin verkosta (jotta sovellus ja vuoronumerotila pysyvät ajan tasalla),
 // käytä välimuistia vain offline-tilanteessa varmuuskopiona.
-const CACHE = 'vuoronumero-v1';
+const CACHE = 'vuoronumero-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -12,7 +12,7 @@ const ASSETS = [
   './icons/icon-192.svg',
   './icons/icon-512.svg',
   './icons/icon-maskable.svg',
-  './icons/logo.svg'
+  './icons/silmaasema-logo.svg'
 ];
 
 self.addEventListener('install', (event) => {

@@ -5,3 +5,10 @@ supabase.sql
 .claude/
 Brändikäsikirja.pdf
 brandbook.txt
+
+# Logon vektorointityökalu (kertakäyttöinen)
+node_modules/
+package.json
+package-lock.json
+trace.js
+silmaasema-logo.jpg
