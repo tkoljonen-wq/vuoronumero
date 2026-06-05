@@ -121,7 +121,7 @@
       <p class="center" style="margin-top:8px">
         <button id="resetBtn" class="lang-switch" style="border:none;background:none;color:var(--muted);text-decoration:underline;cursor:pointer">${t('newNumber')}</button>
       </p>`;
-    document.getElementById('resetBtn').addEventListener('click', resetTicket);
+    document.getElementById('resetBtn').addEventListener('click', newNumber);
   }
 
   function render() {
@@ -135,19 +135,39 @@
   }
 
   // ---- Toiminnot ----
+  async function takeNumber() {
+    const { data, error } = await sb.rpc('take_number');
+    if (error) throw error;
+    myNumber = data;
+    localStorage.setItem('ticketNumber', String(myNumber));
+    await poll();
+    startPolling();
+  }
+
   async function onEnroll() {
     const btn = document.getElementById('enrollBtn');
     if (btn) btn.disabled = true;
     try {
-      const { data, error } = await sb.rpc('take_number');
-      if (error) throw error;
-      myNumber = data;
-      localStorage.setItem('ticketNumber', String(myNumber));
-      await poll();
-      startPolling();
+      await takeNumber();
     } catch (e) {
       if (btn) { btn.disabled = false; }
       alert(t('offline'));
+    }
+  }
+
+  // "Ota uusi vuoronumero" tutkimuksen jälkeen → hakee suoraan uuden numeron
+  async function newNumber() {
+    const btn = document.getElementById('resetBtn');
+    if (btn) btn.disabled = true;
+    myNumber = null;
+    localStorage.removeItem('ticketNumber');
+    try {
+      await takeNumber();
+    } catch (e) {
+      // esim. jono suljettu → palaa alkunäkymään (näyttää tilan/“suljettu”)
+      lastState = null;
+      stopPolling();
+      bootstrap();
     }
   }
 
