@@ -218,7 +218,7 @@
   // ---- Apu: suorita toiminto ja päivitä ----
   async function act(fn, args) {
     try { await rpc(fn, args); await refresh(); }
-    catch (e) { alert('Toiminto epäonnistui. Tarkista yhteys.'); }
+    catch (e) { alert('Toiminto epäonnistui: ' + (e && e.message ? e.message : 'tarkista yhteys')); }
   }
 
   async function refresh() {
