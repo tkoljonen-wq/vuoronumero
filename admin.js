@@ -105,6 +105,17 @@
             </div>
             <ul class="tlist" id="blist"></ul>
           </div>
+
+          <div class="card">
+            <h2>Tapahtuman lopetus</h2>
+            <p class="muted" style="margin-top:-6px">Poistaa vuoronumerot ja numero–suositus-linkit (GDPR). Ohjelma on tämän jälkeen heti uudelleenkäytettävissä.</p>
+            <div class="row" style="margin-bottom:8px">
+              <button id="clearBtn" class="btn btn--sm btn--ghost">Tyhjennä jono ja tauot</button>
+            </div>
+            <div class="row">
+              <button id="resetAllBtn" class="btn btn--sm btn--accent">Nollaa kaikki (myös tilastot)</button>
+            </div>
+          </div>
         </div>
       </div>`;
 
@@ -145,6 +156,16 @@
       const s = document.getElementById('bStart').value, e = document.getElementById('bEnd').value;
       if (!s || !e) return;
       act('admin_add_break', { p_pwd: pwd, p_alkaa: new Date(s).toISOString(), p_loppuu: new Date(e).toISOString() });
+    });
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      if (confirm('Tyhjennetäänkö kaikki vuoronumerot ja tauot?\n\nTilastot (kyllä/ei/tutkitut) säilyvät. Tätä ei voi perua.')) {
+        act('admin_reset', { p_pwd: pwd, p_full: false });
+      }
+    });
+    document.getElementById('resetAllBtn').addEventListener('click', () => {
+      if (confirm('NOLLATAANKO KAIKKI – myös tilastolaskurit?\n\nVuoronumerot, tauot ja kyllä/ei/tutkitut-laskurit nollataan. Tätä ei voi perua.')) {
+        act('admin_reset', { p_pwd: pwd, p_full: true });
+      }
     });
   }
 
