@@ -100,7 +100,12 @@
       <p class="center muted" style="margin-top:12px">${t('waiting')}</p>
       <section class="card center">
         <a class="link" href="${window.LINKS.about}" target="_blank" rel="noopener">${t('aboutLink')} →</a>
-      </section>`;
+      </section>
+      <p class="center" style="margin-top:8px">
+        <button id="cancelBtn" class="lang-switch" style="border:none;background:none;color:var(--muted);text-decoration:underline;cursor:pointer">${t('cancel')}</button>
+      </p>`;
+    const cb = document.getElementById('cancelBtn');
+    if (cb) cb.addEventListener('click', cancelNumber);
   }
 
   function renderTurn() {
@@ -138,6 +143,7 @@
     if (!myNumber || !s) { renderPreQueue(s); return; }
     if (s.status == null) { resetTicket(); return; }   // numero poistettu (reset) → alkuun
     if (s.status === 'noshow') { resetTicket(); return; }
+    if (s.status === 'peruttu') { resetTicket(); return; }
     if (s.status === 'valmis') { renderDone(s); return; }
     if (s.status === 'vuorossa') { renderTurn(); return; }
     renderWaiting(s);
@@ -177,6 +183,25 @@
       lastState = null;
       stopPolling();
       bootstrap();
+    }
+  }
+
+  // Kävijä peruu vuoronumeronsa
+  async function cancelNumber() {
+    if (!confirm(t('cancelConfirm'))) return;
+    const btn = document.getElementById('cancelBtn');
+    if (btn) btn.disabled = true;
+    try {
+      const { data, error } = await sb.rpc('cancel_number', { p_number: myNumber });
+      if (error) throw error;
+      if (data === true) {
+        resetTicket();                 // peruttu → takaisin alkunäkymään
+      } else {
+        await poll();                  // ei enää jonossa (esim. vuorosi alkoi) → näytä tila
+      }
+    } catch (e) {
+      if (btn) btn.disabled = false;
+      alert(t('offline'));
     }
   }
 
