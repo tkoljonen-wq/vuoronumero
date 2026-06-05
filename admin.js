@@ -24,6 +24,40 @@
     return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
   }
 
+  // Tämän päivän sulkeutumishetki (hours_end, esim. "18:00") Date-objektina.
+  function closingTimeToday(hhmm) {
+    const [h, m] = (hhmm || '18:00').split(':').map(Number);
+    const d = new Date();
+    d.setHours(h, m || 0, 0, 0);
+    return d;
+  }
+
+  // Palauttaa varoituksen, jos nykyinen jono ei arviolta ehdi sulkeutumisaikaan.
+  // Käyttää keskimääräistä tutkimusaikaa (avg_sec); huomioi parhaillaan
+  // palveltavan ja tauot samalla tavalla kuin asiakkaan arvio. null = ei varoitusta.
+  function closingWarning(c, tickets, breaks) {
+    if (!c.is_open) return null;                       // jo suljettu → ei tarvetta
+    const waiting = tickets.filter((t) => t.status === 'odottaa').length;
+    if (waiting === 0) return null;
+    const unit = c.avg_sec > 0 ? c.avg_sec : 360;      // ei dataa → 6 min oletus
+    let secs = waiting * unit;
+    if (c.serving_num != null && c.serving_since) {
+      const elapsed = (Date.now() - new Date(c.serving_since).getTime()) / 1000;
+      secs += Math.max(0, unit - elapsed);
+    }
+    const now = Date.now();
+    (breaks || []).forEach((b) => {
+      const start = new Date(b.alkaa).getTime();
+      const end = new Date(b.loppuu).getTime();
+      if (end > now && start < now + secs * 1000) {
+        secs += (end - Math.max(start, now)) / 1000;
+      }
+    });
+    const endDate = new Date(now + secs * 1000);
+    if (endDate <= closingTimeToday(c.hours_end)) return null;
+    return { end: fmt(endDate), close: c.hours_end };
+  }
+
   // ---- Login ----
   function renderLogin(err) {
     view.innerHTML = `
@@ -55,8 +89,14 @@
     const tickets = state.tickets || [];
     const breaks = state.breaks || [];
     const avgMin = (c.avg_sec > 0) ? (c.avg_sec / 60).toFixed(1) : '–';
+    const warn = closingWarning(c, tickets, breaks);
 
     view.innerHTML = `
+      ${warn ? `<div class="card" style="background:var(--orange);color:#fff;margin-bottom:16px">
+        <strong>⚠ Jono ei arviolta ehdi sulkemisaikaan mennessä</strong>
+        <p style="margin:6px 0 0">Viimeinen vuoro arviolta n. klo ${warn.end}, sulkeutumisaika klo ${warn.close}.<br>
+        Voit sulkea jonotuksen alta (“Tila”) — jonossa olevat ehditään palvella, mutta uusia ei enää oteta.</p>
+      </div>` : ''}
       <div class="stat-row" style="margin-bottom:16px">
         <div class="stat"><div class="v">${c.done_count}</div><div class="k">Tutkittu</div></div>
         <div class="stat"><div class="v">${c.yes_count}</div><div class="k">Kyllä-suositus</div></div>
@@ -80,6 +120,7 @@
               <button id="openBtn" class="btn ${c.is_open ? '' : 'btn--accent'}">${c.is_open ? 'Avoinna – sulje' : 'Suljettu – avaa'}</button>
             </div>
             <p class="muted" style="margin-top:10px">Nyt vuorossa: <strong>${c.serving_num != null ? c.serving_num : '–'}</strong> ${c.serving_since ? '(alkoi ' + fmt(c.serving_since) + ')' : ''}</p>
+            <p class="muted" style="margin-top:6px;font-size:13px">Uuden numeron voi ottaa vain aukioloaikana (klo ${c.hours_start}–${c.hours_end}), vaikka jono olisi auki.</p>
           </div>
 
           <div class="card">
