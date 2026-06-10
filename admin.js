@@ -200,8 +200,12 @@
     // Napit
     document.getElementById('openBtn').addEventListener('click', () =>
       act('admin_set_open', { p_pwd: pwd, p_open: !c.is_open }));
-    document.getElementById('hSave').addEventListener('click', () =>
-      act('admin_set_hours', { p_pwd: pwd, p_start: document.getElementById('hStart').value, p_end: document.getElementById('hEnd').value }));
+    document.getElementById('hSave').addEventListener('click', () => {
+      const start = document.getElementById('hStart').value, end = document.getElementById('hEnd').value;
+      // Tyhjä arvo kantaan rikkoisi hours::time-muunnoksen ja koko asiakasnäkymän
+      if (!start || !end) { alert('Anna molemmat kellonajat.'); return; }
+      act('admin_set_hours', { p_pwd: pwd, p_start: start, p_end: end });
+    });
     document.getElementById('break15').addEventListener('click', () => quickBreak(15));
     document.getElementById('break30').addEventListener('click', () => quickBreak(30));
     document.getElementById('bAdd').addEventListener('click', () => {
