@@ -121,12 +121,11 @@
   }
 
   function renderDone(s) {
-    const yes = s.tulos === 'kylla';
     view.innerHTML = `
       <section class="card center">
         <h1>${t('done')}</h1>
-        <p>${yes ? t('resultYes') : t('resultNo')}</p>
-        <a class="btn ${yes ? '' : 'btn--ghost'}" style="margin-top:10px"
+        <p>${t('resultInfo')}</p>
+        <a class="btn" style="margin-top:10px"
            href="${window.LINKS.booking}" target="_blank" rel="noopener">${t('bookLink')}</a>
       </section>
       <section class="card center">
