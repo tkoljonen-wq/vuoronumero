@@ -6,6 +6,7 @@
   if (Number.isNaN(myNumber)) myNumber = null;
   let pollTimer = null;
   let lastState = null;
+  let stateLoaded = false;
 
   const sb = (window.CONFIG && window.CONFIG.SUPABASE_URL && window.CONFIG.SUPABASE_ANON_KEY && window.supabase)
     ? window.supabase.createClient(window.CONFIG.SUPABASE_URL, window.CONFIG.SUPABASE_ANON_KEY)
@@ -61,13 +62,16 @@
   // ---- Näkymät ----
   function renderPreQueue(s) {
     const closed = s && s.is_open === false;
+    const unknown = !stateLoaded;
     view.innerHTML = `
       <section class="card center">
         <h1>${t('appTitle')}</h1>
         <p class="muted">${t('subtitle')}</p>
-        ${closed
-          ? `<p class="muted closed-note">${t('closed')}</p>`
-          : `<button id="enrollBtn" class="btn" style="margin-top:12px">${t('enroll')}</button>`}
+        ${unknown
+          ? `<p class="muted">${t('connecting')}</p>`
+          : closed
+            ? `<p class="muted closed-note">${t('closed')}</p>`
+            : `<button id="enrollBtn" class="btn" style="margin-top:12px">${t('enroll')}</button>`}
       </section>
       <section class="card center">
         <a class="link" href="${window.LINKS.about}" target="_blank" rel="noopener">${t('aboutLink')} →</a>
@@ -224,6 +228,7 @@
         const { data } = await sb.rpc('get_ticket', { p_number: -1 });
         lastState = data;
       }
+      stateLoaded = true;
       render();
     } catch (e) { /* offline – pidetään edellinen näkymä */ }
   }
