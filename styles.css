@@ -124,6 +124,9 @@ h1, h2, h3 {
 
 .privacy-note { font-size: 13px; color: var(--muted); text-align: center; margin-top: 18px; }
 
+/* Suljettu-ilmoitus: 50 % isompi ja lihavoitu, jotta aukeamisaika huomataan */
+.closed-note { font-size: 1.5em; font-weight: 700; margin-top: 14px; }
+
 /* ===== Admin (työpöytä) ===== */
 .admin { max-width: 1000px; }
 .admin-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; align-items: start; }

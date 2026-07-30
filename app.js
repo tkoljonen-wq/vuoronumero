@@ -66,7 +66,7 @@
         <h1>${t('appTitle')}</h1>
         <p class="muted">${t('subtitle')}</p>
         ${closed
-          ? `<p class="muted" style="margin-top:14px">${t('closed')}</p>`
+          ? `<p class="muted closed-note">${t('closed')}</p>`
           : `<button id="enrollBtn" class="btn" style="margin-top:12px">${t('enroll')}</button>`}
       </section>
       <section class="card center">

@@ -14,7 +14,7 @@ window.I18N = {
     bookLink: 'Varaa aika urheilunäöntutkimukseen',
     resultInfo: 'Suositeltiinko sinulle jatkotutkimusta? Optikko kertoi tuloksen sinulle paikan päällä. Alta löydät lisätietoa Silmäaseman urheilunäöntutkimuksesta ja voit varata ajan.',
     done: 'Kiitos käynnistä!',
-    closed: 'Näöntarkastus aukeaa lauantaina 1.8.2026 klo 11. Palaathan silloin takaisin!',
+    closed: 'Näöntarkastus aukeaa lauantaina 1.8.2026 klo 11:00. Palaathan silloin takaisin!',
     connecting: 'Yhdistetään…',
     offline: 'Yhteys katkesi. Yritetään uudelleen…',
     yourTurn: 'Vuorosi on nyt!',
