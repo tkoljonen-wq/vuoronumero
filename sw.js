@@ -1,7 +1,10 @@
 // Service worker – network first -strategia.
 // Hae aina ensin verkosta (jotta sovellus ja vuoronumerotila pysyvät ajan tasalla),
 // käytä välimuistia vain offline-tilanteessa varmuuskopiona.
-const CACHE = 'vuoronumero-v2';
+// Origin tkoljonen-wq.github.io on jaettu muiden sovellusten kanssa:
+// poistetaan vain tämän sovelluksen omat vanhat välimuistit
+const CACHE_PREFIX = 'vuoronumero-';
+const CACHE = CACHE_PREFIX + 'v3';
 const ASSETS = [
   './',
   './index.html',
@@ -23,7 +26,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
+      Promise.all(keys.filter((k) => k.startsWith(CACHE_PREFIX) && k !== CACHE).map((k) => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
 });
